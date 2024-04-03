@@ -1,5 +1,0 @@
-{
-    "board": "arduino:avr:uno",
-    "port": "/dev/tty.usbmodem2101",
-    "sketch": "Shape_Shift/shape_shift.ino"
-}
