@@ -27,7 +27,7 @@ typedef struct {
 // Function prototypes, operating on an MPU6050 mpu
 void MPU6050_init(MPU6050* mpu);
 void MPU6050_setup(MPU6050* mpu);
-int16_t MPU6050_readData(MPU6050* mpu, int16_t *ax, int16_t *ay, int16_t *az, int16_t *gx, int16_t *gy, int16_t *gz);
+void MPU6050_readData(MPU6050* mpu, float *ax, float *ay, float *az, float *gx, float *gy, float *gz);
 void MPU6050_calibrateSensors(MPU6050* mpu);
 
 #endif // MPU6050_H

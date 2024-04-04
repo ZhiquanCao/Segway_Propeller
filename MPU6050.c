@@ -11,7 +11,7 @@ void MPU6050_init(MPU6050* mpu) {
     mpu->ACCEL_X_OFFSET = 0;
     mpu->ACCEL_Y_OFFSET = 0;
     mpu->ACCEL_Z_OFFSET = 0;
-    
+
     MPU6050_setup(mpu);
     MPU6050_calibrateSensors(mpu);
 }
@@ -19,7 +19,6 @@ void MPU6050_init(MPU6050* mpu) {
 void MPU6050_setup(MPU6050* mpu) {
     // Open and initialize the I2C mpu->bus
     i2c_open(mpu->bus, mpu->sclPin, mpu->sdaPin, 0);
-    
     // Setup MPU6050 (wake up and prepare for gyro reading)
     // Wake up MPU6050 by writing 0 to the PWR_MGMT_1 register
     i2c_start(mpu->bus);
@@ -27,6 +26,7 @@ void MPU6050_setup(MPU6050* mpu) {
     i2c_writeByte(mpu->bus, PWR_MGMT_1);        // Register address
     i2c_writeByte(mpu->bus, 0);                 // Write value to wake up MPU6050
     i2c_stop(mpu->bus);
+
 
     // Set FS_SEL to 0 for +/- 250 degrees/second full-scale range
     i2c_start(mpu->bus);
@@ -37,49 +37,41 @@ void MPU6050_setup(MPU6050* mpu) {
     
 }
 
-int16_t MPU6050_readData(MPU6050* mpu, int16_t *ax, int16_t *ay, int16_t *az, int16_t *gx,
-                         int16_t *gy, int16_t *gz) {
+void MPU6050_readData(MPU6050* mpu, float *ax, float *ay, float *az, float *gx,
+                         float *gy, float *gz) {
     unsigned char data[14];
 
-    // Start reading from ACCEL_XOUT_H, auto-increment through to GYRO_ZOUT_L
     i2c_start(mpu->bus);
     i2c_writeByte(mpu->bus, MPU6050_ADDR << 1);
-    i2c_writeByte(mpu->bus, ACCEL_XOUT_H);
+    i2c_writeByte(mpu->bus, ACCEL_XOUT_H); // Start from the first accelerometer register
     i2c_stop(mpu->bus);
-    
+
     i2c_start(mpu->bus);
-    i2c_writeByte(mpu->bus, (MPU6050_ADDR << 1) | 1); // MPU6050 read address
-    i2c_readData(mpu->bus, data, 14); // Read 14 bytes: ACC_XYZ + TEMP + GYRO_XYZ
+    i2c_writeByte(mpu->bus, (MPU6050_ADDR << 1) | 1);
+    i2c_readData(mpu->bus, data, 14); // Read 14 bytes to cover accel, temp (ignored), and gyro
     i2c_stop(mpu->bus);
     
     // Convert the data to 16-bit integers and then to float values
-    *ax = ((int16_t)(data[0] << 8 | data[1]) - mpu->ACCEL_X_OFFSET) / 16384.0f; // Assuming AFS_SEL = 0
+    *ax = ((int16_t)(data[0] << 8 | data[1]) - mpu->ACCEL_X_OFFSET) / 16384.0f;
     *ay = ((int16_t)(data[2] << 8 | data[3]) - mpu->ACCEL_Y_OFFSET) / 16384.0f;
     *az = ((int16_t)(data[4] << 8 | data[5]) - mpu->ACCEL_Z_OFFSET) / 16384.0f;
     *gx = ((int16_t)(data[8] << 8 | data[9]) - mpu->GYRO_X_OFFSET) / 131.0f; // Assuming FS_SEL = 0
     *gy = ((int16_t)(data[10] << 8 | data[11]) - mpu->GYRO_Y_OFFSET) / 131.0f;
     *gz = ((int16_t)(data[12] << 8 | data[13]) - mpu->GYRO_Z_OFFSET) / 131.0f;
-
-    *ax = 1234;
-    return *ax;
 }
 
-int16_t MPU6050_calibrateSensors(MPU6050* mpu) {
-    const int durationMs = 3000; // Duration for calibration (3 seconds)
-    const int startTime = CNT; // Current Propeller counter (CNT)
-    const int clkfreqMs = CLKFREQ / 1000; // Clock ticks per millisecond
-    
+void MPU6050_calibrateSensors(MPU6050* mpu) {
     long sumGX = 0, sumGY = 0, sumGZ = 0;
     long sumAX = 0, sumAY = 0, sumAZ = 0;
     int count = 0;
-    
-    while(CNT - startTime < durationMs * clkfreqMs) {
+    int i;
+    for (i=0; i<100; i++) {
         unsigned char data[14];
         i2c_start(mpu->bus);
         i2c_writeByte(mpu->bus, MPU6050_ADDR << 1);
         i2c_writeByte(mpu->bus, ACCEL_XOUT_H); // Start from the first accelerometer register
         i2c_stop(mpu->bus);
-    
+
         i2c_start(mpu->bus);
         i2c_writeByte(mpu->bus, (MPU6050_ADDR << 1) | 1);
         i2c_readData(mpu->bus, data, 14); // Read 14 bytes to cover accel, temp (ignored), and gyro
@@ -93,7 +85,7 @@ int16_t MPU6050_calibrateSensors(MPU6050* mpu) {
         int gx = (int16_t)(data[8] << 8 | data[9]);
         int gy = (int16_t)(data[10] << 8 | data[11]);
         int gz = (int16_t)(data[12] << 8 | data[13]);
-        
+
         sumAX += ax;
         sumAY += ay;
         sumAZ += az;
