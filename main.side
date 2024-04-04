@@ -1,8 +1,10 @@
 main.c
 MPU6050.c
+KalmanFilter.c
 >compiler=C
 >memtype=cmm main ram compact
 >optimize=-Os
 >-m32bit-doubles
 >-fno-exceptions
+>-lm
 >BOARD::ACTIVITYBOARD

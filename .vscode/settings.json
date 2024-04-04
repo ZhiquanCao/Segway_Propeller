@@ -1,4 +1,7 @@
 {
-    "topLevel": "main" // Without the .c extension
+    "topLevel": "main",
+    "files.associations": {
+        "kalmanfilter.h": "c"
+    } // Without the .c extension
 }
   
