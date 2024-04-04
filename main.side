@@ -1,6 +1,8 @@
 main.c
+MPU6050.c
 >compiler=C
 >memtype=cmm main ram compact
 >optimize=-Os
+>-m32bit-doubles
 >-fno-exceptions
 >BOARD::ACTIVITYBOARD
