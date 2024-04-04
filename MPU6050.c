@@ -2,6 +2,7 @@
 #include "simplei2c.h"   // Include the I2C library
 #include "MPU6050.h"
 
+
 void MPU6050_init(MPU6050* mpu) {
     mpu->sclPin = 1;
     mpu->sdaPin = 0;
