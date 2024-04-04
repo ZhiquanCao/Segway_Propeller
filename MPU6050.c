@@ -18,7 +18,7 @@ void MPU6050_init(MPU6050* mpu) {
 
 void MPU6050_setup(MPU6050* mpu) {
     // Open and initialize the I2C mpu->bus
-    i2c_open(&(mpu->bus), mpu->sclPin, mpu->sdaPin, 0);
+    i2c_open(mpu->bus, mpu->sclPin, mpu->sdaPin, 0);
     
     // Setup MPU6050 (wake up and prepare for gyro reading)
     // Wake up MPU6050 by writing 0 to the PWR_MGMT_1 register
@@ -37,7 +37,7 @@ void MPU6050_setup(MPU6050* mpu) {
     
 }
 
-void MPU6050_readData(MPU6050* mpu, int16_t *ax, int16_t *ay, int16_t *az, int16_t *gx,
+int16_t MPU6050_readData(MPU6050* mpu, int16_t *ax, int16_t *ay, int16_t *az, int16_t *gx,
                          int16_t *gy, int16_t *gz) {
     unsigned char data[14];
 
@@ -59,11 +59,12 @@ void MPU6050_readData(MPU6050* mpu, int16_t *ax, int16_t *ay, int16_t *az, int16
     *gx = ((int16_t)(data[8] << 8 | data[9]) - mpu->GYRO_X_OFFSET) / 131.0f; // Assuming FS_SEL = 0
     *gy = ((int16_t)(data[10] << 8 | data[11]) - mpu->GYRO_Y_OFFSET) / 131.0f;
     *gz = ((int16_t)(data[12] << 8 | data[13]) - mpu->GYRO_Z_OFFSET) / 131.0f;
-    
+
+    *ax = 1234;
+    return *ax;
 }
 
-
-void MPU6050_calibrateSensors(MPU6050* mpu) {
+int16_t MPU6050_calibrateSensors(MPU6050* mpu) {
     const int durationMs = 3000; // Duration for calibration (3 seconds)
     const int startTime = CNT; // Current Propeller counter (CNT)
     const int clkfreqMs = CLKFREQ / 1000; // Clock ticks per millisecond
