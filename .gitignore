@@ -1,3 +1,5 @@
 .DS_Store
 .vscode/
 cmm/*
+main.binary
+main.elf
