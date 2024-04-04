@@ -4,7 +4,7 @@
 
 int main() {
     float ax, ay, az, gx, gy, gz;
-    float dt = 0.005, Q_angle = 0.001, Q_gyro = 0.005, R_angle = 0.5, C_0 = 1, K1 = 0.05;
+    float dt = 0.005, Q_angle = 0.001, Q_gyro = 0.003, R_angle = 0.03, C_0 = 1, K1 = 0.05;
 
     MPU6050 mpu;
     KalmanFilter kalmanfilter;
