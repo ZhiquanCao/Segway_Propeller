@@ -1,0 +1,6 @@
+main.c
+>compiler=C
+>memtype=cmm main ram compact
+>optimize=-Os
+>-fno-exceptions
+>BOARD::ACTIVITYBOARD

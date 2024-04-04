@@ -1,0 +1,138 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "compileP2",
+        "type": "shell",
+        "osx": {
+          "command": "/Users/Apple/Propeller/src/flexprop/bin/flexcc.mac"
+        },
+        "windows": {
+          "command": "flexcc.exe"
+        },
+        "linux": {
+          "command": "/opt/flexprop/bin/flexcc"
+        },
+        "args": [
+            "-2",
+            "-O2",
+            "-I", "${workspaceFolder}/include",
+            "-o", "${fileDirname}/${fileBasenameNoExtension}.binary",
+            "${workspaceFolder}/main.c"
+        ],
+        "problemMatcher": {
+          "owner": "Spin2",
+          "fileLocation": ["autoDetect", "${workspaceFolder}"],
+          "pattern": {
+            "regexp": "^(.*):(\\d+):\\s+(warning|error):\\s+(.*)$",
+            "file": 1,
+            "line": 2,
+            "severity": 3,
+            "message": 4
+          }
+        },
+        "presentation": {
+          "panel": "dedicated",
+          "focus": false,
+          "showReuseMessage": false,
+          "clear": true
+        },
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        }
+      },
+      {
+        "label": "compileTopP2",
+        "type": "shell",
+        "osx": {
+          "command": "/Users/Apple/Propeller/src/flexprop/bin/flexcc.mac"
+        },
+        "windows": {
+          "command": "flexcc.exe"
+        },
+        "linux": {
+          "command": "/opt/flexprop/bin/flexcc"
+        },
+        "args": [
+            "-2",
+            "-O2",
+            "-I", "${workspaceFolder}/include",
+            "-o", "${fileDirname}/${fileBasenameNoExtension}.binary",
+            "${workspaceFolder}/main.c"
+        ],
+        "problemMatcher": {
+          "owner": "Spin2",
+          "fileLocation": ["autoDetect", "${workspaceFolder}"],
+          "pattern": {
+            "regexp": "^(.*):(\\d+):\\s+(warning|error):\\s+(.*)$",
+            "file": 1,
+            "line": 2,
+            "severity": 3,
+            "message": 4
+          }
+        },
+        "presentation": {
+          "panel": "dedicated",
+          "focus": false,
+          "showReuseMessage": false,
+          "clear": true
+        },
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        }
+      },
+      {
+        "label": "downloadP2",
+        "type": "shell",
+        "osx": {
+          "command": "/Users/Apple/Propeller/src/flexprop/bin/loadp2.mac",
+          "args": [
+            "-b", "230400",
+            "-p", "/dev/ttyUSB0", // Replace with your actual serial port
+            "-f", "80000000", // Default clock frequency, change if needed
+            "-t", // If you want terminal mode after upload
+            "${workspaceFolder}/${config:topLevel}.binary" // Assumes topLevel is defined in settings and points to the main binary
+          ]},
+        "problemMatcher": [],
+        "presentation": {
+          "panel": "dedicated",
+          "focus": false,
+          "showReuseMessage": false,
+          "clear": true
+        },
+        "group": {
+          "kind": "test",
+          "isDefault": true
+        },
+        "dependsOn": ["compileTopP2"]
+      },
+      {
+        "label": "flashP2",
+        "type": "shell",
+        "osx": {
+          "command": "/Users/Apple/Propeller/src/flexprop/bin/loadp2.mac",
+          "args": [
+            "-b", "230400",
+            "-p", "/dev/tty.usbserial-XXXXXX", // Replace with your actual serial port
+            "@0=/Users/Apple/Propeller/src/flexprop/board/P2ES_flashloader.bin",
+            "@8000", // This assumes your program should be loaded at address 0x8000
+            "+${workspaceFolder}/build/${config:topLevel}.binary", // Replace /build/ with the actual directory containing your binary if different
+            "-t",
+            "-k"
+          ]        },
+        "problemMatcher": [],
+        "presentation": {
+          "panel": "dedicated",
+          "focus": false,
+          "showReuseMessage": false,
+          "clear": true
+        },
+        "group": {
+          "kind": "test",
+          "isDefault": true
+        },
+        "dependsOn": ["compileTopP2"]
+      },
+}
