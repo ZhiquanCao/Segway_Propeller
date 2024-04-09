@@ -4,8 +4,9 @@
 #include "servo.h"
 
 
-#define servoY = 12;
-#define servoX = 13;
+#define servoY 12
+#define servoX 13
+#define reset_pin 3
 
 volatile float x_angle = 0;
 volatile float y_angle = 0;
@@ -18,8 +19,13 @@ void readAngle(){
   float local_x_angle =   0;
   float local_y_angle = 0;
   float local_z_angle = 0;
-  float scale = 11;
   float epsilon = 0.5;
+  float threshold = 1.2; // *sensitive parameter*
+  float scale1 = 10;
+  float scale2 = 21.89; // *sensitive parameter*
+  float power = 1.091; // *sensitive parameter*
+  float multiplier = 1.62;
+  
   
   MPU6050 mpu;
   KalmanFilter kalmanfilter;
@@ -28,15 +34,37 @@ void readAngle(){
   while(1) {
       MPU6050_readData(&mpu, &ax, &ay, &az, &gx, &gy, &gz);
       Angle(&kalmanfilter, ax, ay, az, gx, gy, gz, dt, Q_angle, Q_gyro, R_angle, C_0, K1);
-      if (abs(gx) > epsilon) local_x_angle += gx;
-      if (abs(gy) > epsilon) local_y_angle += gy;
-      if (abs(gz) > epsilon) local_z_angle += gz;
-      x_angle = local_x_angle/scale;
-      y_angle = local_y_angle/scale;
-      z_angle = local_z_angle/scale;
-      print("Accel X: %.2f, Accel Y: %.2f, Accel Z: %.2f, Gyro X: %.2f, Gyro Y: %.2f, Gyro Z: %.2f\n", ax, ay, az, gx, gy, gz);
+      if (abs(gx) > epsilon) {
+        if (abs(gx) > threshold) {
+          x_angle += ((gx<0) ? -pow(abs(gx), power) : pow(gx, power)) / scale2 * multiplier;
+        }else{
+          x_angle += gx / scale1 * multiplier;
+        }
+      }        
+      if (abs(gy) > epsilon) {
+        if (abs(gy) > threshold) {
+          y_angle += ((gy<0) ? -pow(abs(gy), power) : pow(gy, power)) / scale2 * multiplier;
+        }else{
+          y_angle += gy / scale1 * multiplier;
+        }
+      }       
+      if (abs(gz) > epsilon) {
+        if (abs(gz) > threshold) {
+          z_angle += ((gz<0) ? -pow(abs(gz), power) : pow(gz, power)) / scale2 * multiplier;
+        }else{
+          z_angle += gz / scale1 * multiplier;
+        }
+      }    
+      if (!input(reset_pin)){
+        x_angle = 0;
+        y_angle = 0;
+        z_angle = 0;
+      }        
+      
+      // print("Accel X: %.2f, Accel Y: %.2f, Accel Z: %.2f, Gyro X: %.2f, Gyro Y: %.2f, Gyro Z: %.2f\n", ax, ay, az, gx, gy, gz);
       // print("kalmanfilter x angle = %f", kalmanfilter.angle);
-      print("x_angle: %f, y_angle: %f, z_angle: %f \n", local_x_angle/scale, local_y_angle/scale, local_z_angle/scale);
+      print("                                          Gyro X: %.2f, Gyro Y: %.2f, Gyro Z: %.2f\n", gx, gy, gz);
+      print("x_angle: %f, y_angle: %f, z_angle: %f \n", x_angle, y_angle, z_angle);
       
       pause(3);
   }
@@ -44,12 +72,13 @@ void readAngle(){
 
 
 int main() {
+    set_direction(reset_pin, 0);
     // initial servo setup
     servo_angle(12, 900);
     servo_angle(13, 900);
 
     int stack[256];
-    cogstart(&readAngle, NULL, stack, sizeof(stack)); 
+    // cogstart(&readAngle, NULL, stack, sizeof(stack)); 
     
     float y = 0;
     float x = 0;

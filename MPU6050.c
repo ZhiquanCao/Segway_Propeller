@@ -1,5 +1,5 @@
-#include "simpletools.h" // Include simpletools for convenience functions
-#include "simplei2c.h"   // Include the I2C library
+#include "simpletools.h" 
+#include "simplei2c.h"
 #include "MPU6050.h"
 
 
