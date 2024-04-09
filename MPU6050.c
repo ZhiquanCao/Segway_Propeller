@@ -107,6 +107,6 @@ void MPU6050_calibrateSensors(MPU6050* mpu) {
     mpu->ACCEL_Y_OFFSET = sumAY / count;
     mpu->ACCEL_Z_OFFSET = sumAZ / count; // Assuming the sensor is stationary and facing upwards
     
-    print("Calibration complete. Gyro Offsets: X=%d, Y=%d, Z=%d\n", mpu->GYRO_X_OFFSET, mpu->GYRO_Y_OFFSET, mpu->GYRO_Z_OFFSET);
-    print("Calibration complete. Accel Offsets: X=%d, Y=%d, Z=%d\n", mpu->ACCEL_X_OFFSET, mpu->ACCEL_Y_OFFSET, mpu->ACCEL_Z_OFFSET);
+    //print("Calibration complete. Gyro Offsets: X=%d, Y=%d, Z=%d\n", mpu->GYRO_X_OFFSET, mpu->GYRO_Y_OFFSET, mpu->GYRO_Z_OFFSET);
+    //print("Calibration complete. Accel Offsets: X=%d, Y=%d, Z=%d\n", mpu->ACCEL_X_OFFSET, mpu->ACCEL_Y_OFFSET, mpu->ACCEL_Z_OFFSET);
 }
